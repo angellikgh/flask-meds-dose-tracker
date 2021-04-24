@@ -12,3 +12,14 @@ class Users(UserMixin, db.Model):
 
     def __repr__(self):
         return f'{self.first_name} {self.last_name}'
+
+
+class Medicines(db.Model):
+    """Medicines table"""
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    dosage = db.Column(db.Integer, nullable=False)
+    frequency = db.Column(db.String, nullable=False)
+
+    def __repr__(self):
+        return self.name
