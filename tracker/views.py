@@ -1,6 +1,6 @@
 from tracker import app, db, login_manager
-from tracker.forms import RegisterForm, LoginForm
-from tracker.models import Users
+from tracker.forms import RegisterForm, LoginForm, MedicineForm
+from tracker.models import Users, Medicines
 from flask import render_template, flash, url_for, redirect
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import current_user, login_user, logout_user, login_required
@@ -20,7 +20,11 @@ def index():
 @login_required
 def profile(name):
     user = Users.query.filter_by(first_name=name).first_or_404()
-    return render_template('profile.html', profile=user)
+    medicines = Medicines.query.all()
+    form = MedicineForm()
+    if form.validate_on_submit():
+        pass
+    return render_template('profile.html', profile=user, form=form, medicines=medicines)
 
 
 @app.route('/register', methods=['GET', 'POST'])
