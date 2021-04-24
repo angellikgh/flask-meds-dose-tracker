@@ -1,5 +1,6 @@
 body {
     font-family: 'Ubuntu', sans-serif;
+    font-size: 1.2rem;
 }
 
 h1, h2 {
@@ -8,5 +9,39 @@ h1, h2 {
 
 .teal {
     background: #20c997;
+}
+
+nav .btn:hover {
+    color: #20c997;
+}
+
+/* Form styling */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.centered-content {
+  display: flex;
+  align-items: center;
+  margin: 40px 0;
+  height: 100vh;
+}
+
+.help-block {
+    color: red;
+}
+
+[type=submit]:hover {
+    color: white;
+}
+
+
+/* Tablet and desktop styling */
+@media only screen and (min-width: 992px) {
+
+    .centered-content {
+      margin: 0;
+    }
+
 }
 
