@@ -3,7 +3,7 @@ from tracker.forms import RegisterForm, LoginForm
 from tracker.models import Users
 from flask import render_template, flash, url_for, redirect
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import current_user, login_user
+from flask_login import current_user, login_user, logout_user, login_required
 
 
 @login_manager.user_loader
@@ -16,9 +16,11 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/profile')
-def profile():
-    return render_template('profile.html')
+@app.route('/profile/<name>')
+@login_required
+def profile(name):
+    user = Users.query.filter_by(first_name=name).first_or_404()
+    return render_template('profile.html', profile=user)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -74,5 +76,12 @@ def login():
         else:
             login_user(user)
             flash('You are logged in successfully', "success")
-            return redirect(url_for('profile'))
+            return redirect(url_for('profile', name=current_user.first_name))
     return render_template('auth/login.html', form=form)
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    flash('You are logged out successfully', "success")
+    return redirect(url_for('login'))
