@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, validators
+from wtforms import StringField, SubmitField, PasswordField, validators, IntegerField, SelectField
 
 
 class RegisterForm(FlaskForm):
@@ -23,3 +23,13 @@ class LoginForm(FlaskForm):
     password = PasswordField("Password", [validators.InputRequired(message="This field cannot be empty."),
                                           validators.Length(min=8, message="Password must be at least 8 characters.")])
     submit = SubmitField("Log in")
+
+
+class MedicineForm(FlaskForm):
+    name = StringField("Medicine Name", [validators.InputRequired(message="This field cannot be empty."),
+                                         validators.Length(min=2, max=100,
+                                                           message="Medicine name must be between 2 to 100 characters.")
+                                         ])
+    dosage = IntegerField("Dosage", [validators.InputRequired(message="This field cannot be empty.")])
+    frequency = SelectField("Frequency", choices=['Daily️', 'Bi-Daily', 'Weekly️️', 'Monthly'])
+    submit = SubmitField("Add")
