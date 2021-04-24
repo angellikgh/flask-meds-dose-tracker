@@ -1,8 +1,32 @@
 {% extends 'base.html' %}
-{% block title %} Home {% endblock %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block title %} Profile {% endblock %}
 
 {% block content %}
 <div class="container my-5">
    {% include "_message.html" %}
+
+   <div class="container px-4">
+     <div class="row g-4">
+       <div class="col-lg-8">
+        <div class="p-3 border bg-light">
+            {% if medicines %}
+
+            {% else%}
+                <h2 class="text-center">No medication information to track yet. </h2>
+            {% endif %}
+        </div>
+       </div>
+       <div class="col-lg-4">
+         <div class="p-3 border bg-light">
+             <h2 class="text-center">Add new info </h2>
+             {% include "_message.html" %}
+
+            {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "lg teal"}) }}
+         </div>
+       </div>
+     </div>
+   </div>
+
 </div>
 {% endblock %}
