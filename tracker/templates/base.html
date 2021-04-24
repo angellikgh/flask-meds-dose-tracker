@@ -29,10 +29,26 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse justify-content-end" id="navbarNav" >
-      <div class="d-grid d-md-block gap-3">
-        <a class="btn btn-outline-dark btn-lg me-md-3" href="{{ url_for('login') }}" role="button">Log in</a>
-        <a class="btn btn-dark btn-lg" href="{{ url_for('register') }}" role="button">Register</a>
-      </div>
+
+      {% if current_user.is_authenticated%}
+            <div class="dropdown authenticated d-grid d-md-block gap-2">
+                <button class="btn btn-dark btn-lg dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{current_user.first_name}}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="dropdownMenuButton1">
+                    <li><a class="dropdown-item" href="{{ url_for('profile', name=current_user.first_name) }}">Profile</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </div>
+            {% else %}
+            <div class="d-grid d-md-block gap-3">
+              <a class="btn btn-outline-dark btn-lg me-md-3" href="{{ url_for('login') }}" role="button">Log in</a>
+              <a class="btn btn-dark btn-lg" href="{{ url_for('register') }}" role="button">Register</a>
+            </div>
+            {% endif %}
+
+
     </div>
   </div>
 </nav>

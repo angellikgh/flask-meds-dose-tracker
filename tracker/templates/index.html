@@ -3,6 +3,7 @@
 
 {% block content %}
 <div class="container my-5">
+   {% include "_message.html" %}
   <div class="card bg-dark text-white">
   <img src="{{ url_for('static', filename='images/main.jpg') }}" class="card-img" alt="Human holding drug" style="opacity: 0.3;">
   <div class="card-img-overlay overflow-auto">
