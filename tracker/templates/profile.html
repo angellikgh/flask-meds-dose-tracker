@@ -11,7 +11,37 @@
        <div class="col-lg-8">
         <div class="p-3 border bg-light">
             {% if medicines %}
+                <div class="table-responsive">
+                    <h2 class="text-center">Medications </h2>
+                     <table class="table table-success table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th scope="col">S/N</th>
+                      <th scope="col">Medicine Name</th>
+                      <th scope="col">Dosage</th>
+                      <th scope="col">Frequency</th>
+                        <th scope="col"></th>
+                    </tr>
+                  </thead>
+                    <tbody>
+                        {% for medicine in medicines %}
+                        <tr>
+                          <th scope="row">{{ medicine.id }}</th>
+                          <td>{{ medicine.name }}</td>
+                          <td>{{ medicine.dosage }}/ {{ medicine.dosage_unit }}</td>
+                          <td>{{ medicine.frequency }} / {{ medicine.frequency_unit }}</td>
+                            <td>
+                                <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                    <a href="#" class="btn btn-primary btn-warning"><i class="fas fa-edit"></i> </a>
+                                    <a href="#" class="btn btn-primary btn-danger"><i class="fas fa-trash-alt"></i></a>
+                                </div>
 
+                            </td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                </table>
+                </div>
             {% else%}
                 <h2 class="text-center">No medication information to track yet. </h2>
             {% endif %}
@@ -20,13 +50,10 @@
        <div class="col-lg-4">
          <div class="p-3 border bg-light">
              <h2 class="text-center">Add new info </h2>
-             {% include "_message.html" %}
-
             {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "lg teal"}) }}
          </div>
        </div>
      </div>
    </div>
-
 </div>
 {% endblock %}
