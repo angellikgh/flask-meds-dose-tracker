@@ -121,6 +121,8 @@ def register():
             # Make sure the email does not exist
             if Users.query.filter_by(email=email).first():
                 flash("That email exists in the database, try another", "danger")
+            elif Users.query.filter_by(phone_number=phone_number).first():
+                flash("That number exists in the database, try another", "danger")
             else:
                 encrypt_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
 
@@ -134,13 +136,13 @@ def register():
                 db.session.add(new_user)
                 db.session.commit()
                 login_user(new_user)
-                flash(f'Registration successful {first_name}, Verify your phone number', "success")
 
                 verify = client.verify.services(service_sid)
                 try:
                     verify.verifications.create(to=current_user.phone_number, channel='sms')
                 except TwilioException:
                     verify.verifications.create(to=current_user.phone_number, channel='call')
+                flash(f'Registration successful {first_name}, Verify your phone number', "success")
                 return redirect(url_for('verify_code'))
     return render_template('auth/register.html', form=form)
 
