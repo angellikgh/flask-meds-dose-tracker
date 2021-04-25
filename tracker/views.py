@@ -1,7 +1,7 @@
 from tracker import app, db, login_manager
 from tracker.forms import RegisterForm, LoginForm, MedicineForm
 from tracker.models import Users, Medicines
-from flask import render_template, flash, url_for, redirect
+from flask import render_template, flash, url_for, redirect, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import current_user, login_user, logout_user, login_required
 
@@ -16,15 +16,37 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/profile/<name>')
+@app.route('/profile/<name>', methods=['GET', 'POST'])
 @login_required
 def profile(name):
     user = Users.query.filter_by(first_name=name).first_or_404()
     medicines = Medicines.query.all()
+    med_count = 0
     form = MedicineForm()
     if form.validate_on_submit():
-        pass
-    return render_template('profile.html', profile=user, form=form, medicines=medicines)
+        name = form.name.data.title()
+        dosage = form.dosage.data
+        dosage_unit = form.dosage_unit.data
+        frequency = form.frequency.data
+        frequency_unit = form.frequency_unit.data
+
+        # Make medication does not exist
+        if Medicines.query.filter_by(name=name).first():
+            flash("That medication info already exist in the database", "danger")
+            return redirect(request.referrer)
+        else:
+            new_meds = Medicines(
+                name=name,
+                dosage=dosage,
+                dosage_unit=dosage_unit,
+                frequency=frequency,
+                frequency_unit=frequency_unit
+            )
+            db.session.add(new_meds)
+            db.session.commit()
+            flash(f'"{name}" medication info added successfully', "success")
+            return redirect(request.referrer)
+    return render_template('profile.html', profile=user, form=form, medicines=medicines, med_count=med_count)
 
 
 @app.route('/register', methods=['GET', 'POST'])
