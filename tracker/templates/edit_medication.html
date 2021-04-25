@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block title %} Edit Medication {% endblock %}
+
+{% block navbar %}
+{% endblock %}
+
+{% block content %}
+<div class="centered-content">
+    <div class="container">
+        <a href="{{ url_for('index') }}">
+            <img class="d-block mx-auto mb-4" src="{{url_for('static', filename='images/rsz_mdt1.png')}}" alt="MDT logo">
+        </a>
+        <h1 class="display-5 text-center">Edit Medication</h1>
+        <div class="col-lg-6 mx-auto">
+            {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "lg teal"}, extra_classes="p-5 border rounded-3 bg-light") }}
+        </div>
+    </div>
+</div>
+{% endblock %}
