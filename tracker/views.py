@@ -67,6 +67,7 @@ def edit(med_id):
         medicine.frequency = edit_medication.frequency.data
         medicine.frequency_unit = edit_medication.frequency_unit.data
         db.session.commit()
+        flash(f'"{medicine.name}" medication updated successfully', "success")
         return redirect(url_for('profile', name=current_user.first_name))
     return render_template('edit_medication.html', form=edit_medication)
 
