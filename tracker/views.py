@@ -1,5 +1,3 @@
-from twilio.base.exceptions import TwilioException
-
 from tracker import app, login_manager
 from tracker.forms import *
 from tracker.models import *
@@ -7,6 +5,7 @@ from flask import render_template, flash, url_for, redirect, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import current_user, login_user, logout_user, login_required
 from twilio.rest import Client
+from twilio.base.exceptions import TwilioException
 from phonenumbers import NumberParseException, is_possible_number, parse, is_valid_number
 import os
 from dotenv import load_dotenv
@@ -135,14 +134,14 @@ def register():
                 db.session.add(new_user)
                 db.session.commit()
                 login_user(new_user)
-                flash(f'Registration successful {first_name}, Start tracking...', "success")
+                flash(f'Registration successful {first_name}, Verify your phone number', "success")
 
                 verify = client.verify.services(service_sid)
                 try:
                     verify.verifications.create(to=current_user.phone_number, channel='sms')
                 except TwilioException:
                     verify.verifications.create(to=current_user.phone_number, channel='call')
-                return redirect(url_for('profile', name=current_user.first_name))
+                return redirect(url_for('verify_code'))
     return render_template('auth/register.html', form=form)
 
 
