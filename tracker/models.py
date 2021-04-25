@@ -19,7 +19,9 @@ class Medicines(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
     dosage = db.Column(db.Integer, nullable=False)
+    dosage_unit = db.Column(db.String, nullable=False)
     frequency = db.Column(db.String, nullable=False)
+    frequency_unit = db.Column(db.String, nullable=False)
 
     def __repr__(self):
         return self.name

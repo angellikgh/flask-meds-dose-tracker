@@ -31,5 +31,7 @@ class MedicineForm(FlaskForm):
                                                            message="Medicine name must be between 2 to 100 characters.")
                                          ])
     dosage = IntegerField("Dosage", [validators.InputRequired(message="This field cannot be empty.")])
-    frequency = SelectField("Frequency", choices=['Daily️', 'Bi-Daily', 'Weekly️️', 'Monthly'])
+    dosage_unit = SelectField("Dosage Unit", choices=["Drop", "Pill", "Tablet", "Vial", "Others"])
+    frequency = SelectField("Frequency", choices=['Daily️', 'Weekly️️', 'Monthly'])
+    frequency_unit = SelectField("Frequency Occurrence", choices=['Once', 'Twice', 'Trice', 'Others'])
     submit = SubmitField("Add")
