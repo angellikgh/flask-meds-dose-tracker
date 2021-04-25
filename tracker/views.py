@@ -146,6 +146,40 @@ def register():
     return render_template('auth/register.html', form=form)
 
 
+@app.route('/verify_code', methods=['GET', 'POST'])
+@login_required
+def verify_code():
+    form = CodeForm()
+    if current_user.verified:
+        flash("You are already verified.", "info")
+        return redirect(url_for('profile', name=current_user.first_name))
+    else:
+        if form.validate_on_submit():
+            code = form.code.data
+            user = Users.query.filter_by(first_name=current_user.first_name).first()
+            verify = client.verify.services(service_sid)
+            check = verify.verification_checks.create(to=current_user.phone_number, code=code)
+
+            if check.status == 'expired':
+                try:
+                    verify.verifications.create(to=user.phone_number, channel='sms')
+                except TwilioException:
+                    verify.verifications.create(to=user.phone_number, channel='call')
+                else:
+                    flash("That code has expired but another has been sent.", "warning")
+                    return redirect(request.referrer)
+
+            if check.status == 'approved':
+                user.verified = True
+                db.session.commit()
+                flash("You are verified, you can now set a reminder alert.", "success")
+                return redirect(url_for('profile', name=current_user.first_name))
+            else:
+                flash("Wrong Code", "danger")
+                return redirect(request.referrer)
+    return render_template('auth/verify_code.html', form=form)
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
