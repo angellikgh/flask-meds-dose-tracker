@@ -19,9 +19,7 @@ def index():
 @app.route('/profile/<name>', methods=['GET', 'POST'])
 @login_required
 def profile(name):
-    user = Users.query.filter_by(first_name=name).first_or_404()
-    medicines = Medicines.query.all()
-    med_count = 0
+    medicines = Medicines.query.filter_by(user_id=current_user.id)
     form = MedicineForm()
     if form.validate_on_submit():
         name = form.name.data.title()
@@ -40,13 +38,14 @@ def profile(name):
                 dosage=dosage,
                 dosage_unit=dosage_unit,
                 frequency=frequency,
-                frequency_unit=frequency_unit
+                frequency_unit=frequency_unit,
+                user_id=current_user.id
             )
             db.session.add(new_meds)
             db.session.commit()
             flash(f'"{name}" medication info added successfully', "success")
             return redirect(request.referrer)
-    return render_template('profile.html', profile=user, form=form, medicines=medicines, med_count=med_count)
+    return render_template('profile.html', form=form, medicines=medicines)
 
 
 @app.route('/edit/<int:med_id>', methods=['GET', 'POST'])
@@ -70,6 +69,15 @@ def edit(med_id):
         flash(f'"{medicine.name}" medication updated successfully', "success")
         return redirect(url_for('profile', name=current_user.first_name))
     return render_template('edit_medication.html', form=edit_medication)
+
+
+@app.route("/delete/<int:med_id>")
+def delete(med_id):
+    delete_med = Medicines.query.get(med_id)
+    db.session.delete(delete_med)
+    db.session.commit()
+    flash("Medication deleted successfully", "success")
+    return redirect(request.referrer)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -101,7 +109,7 @@ def register():
             login_user(new_user)
 
             flash(f'Registration successful {first_name}, Start tracking...', "success")
-            return redirect(url_for('profile'))
+            return redirect(url_for('profile', name=current_user.first_name))
     return render_template('auth/register.html', form=form)
 
 
