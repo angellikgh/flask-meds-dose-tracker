@@ -3,12 +3,13 @@
 {% block title %} Profile {% endblock %}
 
 {% block content %}
-<div class="container my-5">
+<div class="container my-4">
+    <h1>Welcome, {{ current_user.first_name }}</h1>
        {% include "_message.html" %}
      <div class="row g-4">
        <div class="col-lg-8">
         <div class="p-3 border bg-light">
-            {% if medicines %}
+            {% if current_user.medicines %}
                 <div class="table-responsive">
                     <h2 class="text-center">Medications </h2>
                      <table class="table table-success table-striped table-hover">
@@ -32,7 +33,7 @@
                             <td>
                                 <div class="btn-group" role="group" aria-label="Basic mixed styles example">
                                     <a href="{{ url_for('edit', med_id=medicine.id) }}" class="btn btn-primary btn-warning"><i class="fas fa-edit"></i> </a>
-                                    <a href="#" class="btn btn-primary btn-danger"><i class="fas fa-trash-alt"></i></a>
+                                    <a href="{{ url_for('delete', med_id=medicine.id) }}" class="btn btn-primary btn-danger"><i class="fas fa-trash-alt"></i></a>
                                 </div>
 
                             </td>

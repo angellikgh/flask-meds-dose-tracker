@@ -9,6 +9,7 @@ class Users(UserMixin, db.Model):
     last_name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(300), nullable=False)
+    medicines = db.relationship('Medicines', backref='medicine', lazy=True)
 
     def __repr__(self):
         return f'{self.first_name} {self.last_name}'
@@ -22,6 +23,7 @@ class Medicines(db.Model):
     dosage_unit = db.Column(db.String, nullable=False)
     frequency = db.Column(db.String, nullable=False)
     frequency_unit = db.Column(db.String, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     def __repr__(self):
         return self.name
