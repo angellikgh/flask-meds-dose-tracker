@@ -1,14 +1,28 @@
-from tracker import app, db, login_manager
-from tracker.forms import RegisterForm, LoginForm, MedicineForm
-from tracker.models import Users, Medicines
+from twilio.base.exceptions import TwilioException
+
+from tracker import app, login_manager
+from tracker.forms import *
+from tracker.models import *
 from flask import render_template, flash, url_for, redirect, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import current_user, login_user, logout_user, login_required
+from twilio.rest import Client
+from phonenumbers import NumberParseException, is_possible_number, parse, is_valid_number
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return Users.query.get(user_id)
+
+
+# Twilio configs
+account_sid = os.environ['TWILIO_ACCOUNT_SID']
+auth_token = os.environ['TWILIO_AUTH_TOKEN']
+service_sid = os.environ.get('SERVICE_SID')
+client = Client(account_sid, auth_token)
 
 
 @app.route('/')
@@ -90,26 +104,45 @@ def register():
         first_name = form.first_name.data.title()
         last_name = form.last_name.data.title()
         email = form.email.data
+        phone_number = form.phone_number.data
         password = form.password.data
 
-        # Make sure the email does not exist
-        if Users.query.filter_by(email=email).first():
-            flash("That email exists in the database, try another", "danger")
+        try:
+            number = parse(phone_number)
+            if not is_possible_number(number):
+                flash("Check the phone number again", "danger")
+                return redirect(request.referrer)
+            elif not is_valid_number(number):
+                flash("Invalid phone number", "danger")
+                return redirect(request.referrer)
+        except NumberParseException:
+            flash("Add the country code to phone number, eg. +353", "danger")
+            return redirect(request.referrer)
         else:
-            encrypt_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
+            # Make sure the email does not exist
+            if Users.query.filter_by(email=email).first():
+                flash("That email exists in the database, try another", "danger")
+            else:
+                encrypt_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
 
-            new_user = Users(
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                password=encrypt_password,
-            )
-            db.session.add(new_user)
-            db.session.commit()
-            login_user(new_user)
+                new_user = Users(
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                    phone_number=phone_number,
+                    password=encrypt_password,
+                )
+                db.session.add(new_user)
+                db.session.commit()
+                login_user(new_user)
+                flash(f'Registration successful {first_name}, Start tracking...', "success")
 
-            flash(f'Registration successful {first_name}, Start tracking...', "success")
-            return redirect(url_for('profile', name=current_user.first_name))
+                verify = client.verify.services(service_sid)
+                try:
+                    verify.verifications.create(to=current_user.phone_number, channel='sms')
+                except TwilioException:
+                    verify.verifications.create(to=current_user.phone_number, channel='call')
+                return redirect(url_for('profile', name=current_user.first_name))
     return render_template('auth/register.html', form=form)
 
 
