@@ -49,6 +49,28 @@ def profile(name):
     return render_template('profile.html', profile=user, form=form, medicines=medicines, med_count=med_count)
 
 
+@app.route('/edit/<int:med_id>', methods=['GET', 'POST'])
+@login_required
+def edit(med_id):
+    medicine = Medicines.query.get(med_id)
+    edit_medication = MedicineForm(
+        name=medicine.name,
+        dosage=medicine.dosage,
+        dosage_unit=medicine.dosage_unit,
+        frequency=medicine.frequency,
+        frequency_unit=medicine.frequency_unit
+    )
+    if edit_medication.validate_on_submit():
+        medicine.name = edit_medication.name.data.title()
+        medicine.dosage = edit_medication.dosage.data
+        medicine.dosage_unit = edit_medication.dosage_unit.data
+        medicine.frequency = edit_medication.frequency.data
+        medicine.frequency_unit = edit_medication.frequency_unit.data
+        db.session.commit()
+        return redirect(url_for('profile', name=current_user.first_name))
+    return render_template('edit_medication.html', form=edit_medication)
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
